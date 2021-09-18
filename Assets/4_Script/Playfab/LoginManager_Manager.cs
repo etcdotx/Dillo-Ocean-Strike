@@ -60,6 +60,7 @@ public class LoginManager_Manager : MonoBehaviour{
     public c_LoginData m_LoginData;
     public bool m_GuestLoggedIn;
     public bool m_IsLinked;
+    public TextMeshProUGUI m_Text;
     //===== PRIVATES =====
 
     //=====================================================================
@@ -70,10 +71,10 @@ public class LoginManager_Manager : MonoBehaviour{
     }
 
     void Start(){
-        //Debug.Log(ReturnAndroidID());
-        Player_Manager.m_Instance.f_LoadingStart();
-        f_GuestLoginRequest();
-        //f_InitializePlayGamesConfig();
+        Debug.Log(ReturnAndroidID());
+        f_InitializePlayGamesConfig();
+        //f_GoogleSignInRequest();
+        //f_GuestLoginRequest();
     }
 
     void Update(){
@@ -108,6 +109,7 @@ public class LoginManager_Manager : MonoBehaviour{
     /// Method for Requesting PlayFabClientAPI a Guest Login
     /// </summary>
     public void f_GuestLoginRequest() {
+        Player_Manager.m_Instance.f_LoadingStart();
 #if UNITY_ANDROID
         LoginWithAndroidDeviceIDRequest RequestAndroid = new LoginWithAndroidDeviceIDRequest {
             AndroidDeviceId = ReturnAndroidID(),
@@ -187,14 +189,20 @@ public class LoginManager_Manager : MonoBehaviour{
     public void f_GoogleSignInRequest() {
         Social.localUser.Authenticate((p_Success) => {
             if (p_Success) {
+                Player_Manager.m_Instance.f_LoadingStart();
                 string t_ServerAuthCode = PlayGamesPlatform.Instance.GetServerAuthCode();
-
-                if (m_GuestLoggedIn && !m_IsLinked) {
-                    f_LinkWithGoogle(t_ServerAuthCode);
-                }
-                else if (!m_GuestLoggedIn && !m_IsLinked) {
-                    f_LoginWithGoogle(t_ServerAuthCode);
-                }
+                m_Text.text = t_ServerAuthCode;
+                f_LoginWithGoogle(t_ServerAuthCode);
+                //if (m_GuestLoggedIn && !m_IsLinked) {
+                //    f_LinkWithGoogle(t_ServerAuthCode);
+                //}
+                //else if (!m_GuestLoggedIn && !m_IsLinked) {
+                    
+                //}
+            }
+            else {
+                m_Text.text =""+ p_Success;
+                Debug.Log(p_Success);
             }
 
         });
